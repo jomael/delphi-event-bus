@@ -6,8 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.Variants, FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms,
   FMX.Dialogs, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Layouts,
-  FMX.Objects, FMX.Edit, FMX.TabControl, BOsU, EventBus.Commons,
-  EventBus.Attributes;
+  FMX.Objects, FMX.Edit, FMX.TabControl, BOsU, EventBus;
 
 type
   THeaderFooterForm = class(TForm)
@@ -27,7 +26,6 @@ type
     Text2: TText;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
@@ -43,7 +41,7 @@ var
 implementation
 
 uses
-  EventBus;
+  ServicesU;
 
 {$R *.fmx}
 
@@ -51,7 +49,8 @@ procedure THeaderFooterForm.Button1Click(Sender: TObject);
 begin
   AniIndicator1.Enabled := true;
   Button1.Enabled := false;
-  TEventBus.GetDefault.Post(TDoLoginEvent.Create(Edit1.Text, Edit2.Text));
+  GetAccessRemoteDataProxyInstance.DoLogin(TLoginDTO.Create(Edit1.Text,
+    Edit2.Text));
 end;
 
 procedure THeaderFooterForm.Button2Click(Sender: TObject);
@@ -63,13 +62,7 @@ procedure THeaderFooterForm.FormCreate(Sender: TObject);
 begin
   TabControl1.ActiveTab := TabItem1;
   // register subscribers
-  TEventBus.GetDefault.RegisterSubscriber(Self);
-  TEventBus.GetDefault.RegisterSubscriber(TRemoteProxy.GetDefault);
-end;
-
-procedure THeaderFooterForm.FormDestroy(Sender: TObject);
-begin
-  TRemoteProxy.GetDefault.Free;
+  GlobalEventBus.RegisterSubscriber(Self);
 end;
 
 procedure THeaderFooterForm.OnAfterLogin(AEvent: TOnLoginEvent);

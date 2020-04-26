@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2016 Daniele Spinetti
+  Copyright 2016-2019 Daniele Spinetti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ unit EventBus.Subscribers;
 interface
 
 uses
-  System.RTTI, EventBus.Commons;
+  System.RTTI, EventBus;
 
 type
 
@@ -27,22 +27,20 @@ type
   private
     FEventType: TClass;
     FThreadMode: TThreadMode;
-    FPriority: Integer;
     FMethod: TRttiMethod;
     FContext: string;
     procedure SetEventType(const Value: TClass);
     procedure SetMethod(const Value: TRttiMethod);
-    procedure SetPriority(const Value: Integer);
     procedure SetThreadMode(const Value: TThreadMode);
     procedure SetContext(const Value: String);
   public
     constructor Create(ARttiMethod: TRttiMethod; AEventType: TClass;
-      AThreadMode: TThreadMode; const AContext: String = ''; APriority: Integer = 1);
+      AThreadMode: TThreadMode; const AContext: String = '';
+      APriority: Integer = 1);
     destructor Destroy; override;
     property EventType: TClass read FEventType write SetEventType;
     property Method: TRttiMethod read FMethod write SetMethod;
     property ThreadMode: TThreadMode read FThreadMode write SetThreadMode;
-    property Priority: Integer read FPriority write SetPriority;
     property Context: String read FContext write SetContext;
     function Equals(Obj: TObject): Boolean; override;
   end;
@@ -78,7 +76,7 @@ type
 implementation
 
 uses
-  EventBus.Attributes, RTTIUtilsU, System.SysUtils, System.TypInfo;
+  RTTIUtilsU, System.SysUtils, System.TypInfo;
 
 { TSubscriberMethod }
 
@@ -90,7 +88,6 @@ begin
   FEventType := AEventType;
   FThreadMode := AThreadMode;
   FContext := AContext;
-  FPriority := APriority;
 end;
 
 destructor TSubscriberMethod.Destroy;
@@ -126,11 +123,6 @@ end;
 procedure TSubscriberMethod.SetMethod(const Value: TRttiMethod);
 begin
   FMethod := Value;
-end;
-
-procedure TSubscriberMethod.SetPriority(const Value: Integer);
-begin
-  FPriority := Value;
 end;
 
 procedure TSubscriberMethod.SetThreadMode(const Value: TThreadMode);
